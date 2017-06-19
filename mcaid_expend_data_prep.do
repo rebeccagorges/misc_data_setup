@@ -209,34 +209,34 @@ cd `raw'
 
 fromexcel `s' 1996 B C 96-00
 fromexcel `s' 1997 D E 96-00
-fromexcel AK 1998 F G 96-00
-fromexcel AK 1999 H I 96-00
-fromexcel AK 2000 J K 96-00
+fromexcel `s' 1998 F G 96-00
+fromexcel `s' 1999 H I 96-00
+fromexcel `s' 2000 J K 96-00
 
-fromexcel AK 2001 B C 01-05
-fromexcel AK 2002 D E 01-05
-fromexcel AK 2003 F G 01-05
-fromexcel AK 2004 H I 01-05
-fromexcel AK 2005 J K 01-05
+fromexcel `s' 2001 B C 01-05
+fromexcel `s' 2002 D E 01-05
+fromexcel `s' 2003 F G 01-05
+fromexcel `s' 2004 H I 01-05
+fromexcel `s' 2005 J K 01-05
 
-fromexcel AK 2006 B C 06-10
-fromexcel AK 2007 D E 06-10
-fromexcel AK 2008 F G 06-10
-fromexcel AK 2009 H I 06-10
-fromexcel AK 2010 J K 06-10
+fromexcel `s' 2006 B C 06-10
+fromexcel `s' 2007 D E 06-10
+fromexcel `s' 2008 F G 06-10
+fromexcel `s' 2009 H I 06-10
+fromexcel `s' 2010 J K 06-10
 
-fromexcel AK 2011 B C 11-14
-fromexcel AK 2012 D E 11-14
-fromexcel AK 2013 F G 11-14
-fromexcel AK 2014 H I 11-14
+fromexcel `s' 2011 B C 11-14
+fromexcel `s' 2012 D E 11-14
+fromexcel `s' 2013 F G 11-14
+fromexcel `s' 2014 H I 11-14
 
 **merge into single file for the state
 cd `data'
-use `raw'/ltss_exp_AK_1996.dta, clear
+use `raw'/ltss_exp_`s'_1996.dta, clear
 forvalues y=1997/2014{
-append  using `raw'/ltss_exp_AK_`y'.dta
+append  using `raw'/ltss_exp_`s'_`y'.dta
 }
-save ltss_exp_AK_1996-2014.dta, replace
+save ltss_exp_`s'_1996-2014.dta, replace
 
 }
 
@@ -250,5 +250,6 @@ foreach s in `statelistnoak'{
 append  using ltss_exp_`s'_1996-2014.dta
 }
 
+save ltss_exp_all_states_1996-2014.dta, replace
 ****************************************************************8
 log close
