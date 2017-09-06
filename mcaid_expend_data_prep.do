@@ -21,7 +21,7 @@ cd `data'
 local raw `data'\raw\mcaid_ltss_hcbs
 
 *******************************************************
-
+**First for expenditures sheets
 capture program drop fromexcel
 program define fromexcel
 args state yr col1 col2 sheet
@@ -196,9 +196,43 @@ gen str state="`state'"
 
 save ltss_exp_`state'_`yr'.dta,replace
 
-end 
+end  
 ****************************************************************8
-**call program
+**next from precentages sheets
+
+capture program drop fromexcel2
+program define fromexcel2
+args state yr col1 col2 sheet
+
+clear
+
+import excel using LTSS_Historic_Exp_`state'.xlsx, ///
+cellrange(`col1'3:`col2'7) sheet("`state' `sheet' Percentages") 
+
+destring `col1' `col2',replace force
+
+xpose, clear varname
+
+rename v1 ltss_pct_mcaid
+label var ltss_pct_mcaid "Total LTSS as Pct of Total Medicaid"
+rename v2 hcbs_pct_ltss 
+label var hcbs_pct_ltss "Percentage of LTSS that is HCBS"
+rename v3 hcbs_pct_ltss_pop1 
+label var hcbs_pct_ltss_pop1 "Percentage of LTSS that is HCBS-Older Adults,PD"
+rename v4 hcbs_pct_ltss_pop2 
+label var hcbs_pct_ltss_pop2 "Percentage of LTSS that is HCBS-DD"
+rename v5 hcbs_pct_ltss_pop3 
+label var hcbs_pct_ltss_pop3 "Percentage of LTSS that is HCBS-SMI or SD"
+
+gen year=`yr'
+gen str state="`state'"
+
+save ltss_pct_`state'_`yr'.dta,replace
+
+end  
+
+****************************************************************
+**call programs
 local statelist AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA ///
 MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA RI SC SD TN TX UT VA ///
 VT WA WI WV WY
@@ -207,6 +241,7 @@ foreach s in `statelist'{
 
 cd `raw'
 
+**first for expenditures tabs
 fromexcel `s' 1996 B C 96-00
 fromexcel `s' 1997 D E 96-00
 fromexcel `s' 1998 F G 96-00
@@ -230,14 +265,45 @@ fromexcel `s' 2012 D E 11-14
 fromexcel `s' 2013 F G 11-14
 fromexcel `s' 2014 H I 11-14
 
+**next for percentages tabs
+fromexcel2 `s' 1996 B B 96-00
+fromexcel2 `s' 1997 C C 96-00
+fromexcel2 `s' 1998 D D 96-00
+fromexcel2 `s' 1999 E E 96-00
+fromexcel2 `s' 2000 F F 96-00
+
+fromexcel2 `s' 2001 B B 01-05
+fromexcel2 `s' 2002 C C 01-05
+fromexcel2 `s' 2003 D D 01-05
+fromexcel2 `s' 2004 E E 01-05
+fromexcel2 `s' 2005 F F 01-05
+
+fromexcel2 `s' 2006 B B 06-10
+fromexcel2 `s' 2007 C C 06-10
+fromexcel2 `s' 2008 D D 06-10
+fromexcel2 `s' 2009 E E 06-10
+fromexcel2 `s' 2010 F F 06-10
+
+fromexcel2 `s' 2011 B B 11-14
+fromexcel2 `s' 2012 C C 11-14
+fromexcel2 `s' 2013 D D 11-14
+fromexcel2 `s' 2014 E E 11-14
+
+**for each year, merge the exp and expenditures data
+cd `data'
+forvalues y=1996/2014{
+use `raw'/ltss_exp_`s'_`y'.dta, clear
+merge 1:1 state year using `raw'/ltss_pct_`s'_`y'.dta
+save `raw'/ltss_both_`s'_`y'.dta, replace
+}
+
 **merge into single file for the state
 cd `data'
-use `raw'/ltss_exp_`s'_1996.dta, clear
+use `raw'/ltss_both_`s'_1996.dta, clear
 forvalues y=1997/2014{
-append  using `raw'/ltss_exp_`s'_`y'.dta
+append  using `raw'/ltss_both_`s'_`y'.dta
 }
 save ltss_exp_`s'_1996-2014.dta, replace
-
 }
 
 **merge all states into a single file
