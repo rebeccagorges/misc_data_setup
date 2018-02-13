@@ -316,6 +316,8 @@ foreach s in `statelistnoak'{
 append  using ltss_exp_`s'_1996-2014.dta
 }
 
+drop _merge
+
 save ltss_exp_all_states_1996-2014.dta, replace
 ****************************************************************8
 log close
