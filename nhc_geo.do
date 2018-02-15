@@ -130,5 +130,6 @@ collapse hrrnum hrr_*, by(zip)
 *******************************************************
 save `data'\zip_hrr_nhc_ratings_2012.dta, replace
 
+export delimited `data'\zip_hrr_nhc_ratings_2012.csv,replace
 *******************************************************
 log close
