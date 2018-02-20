@@ -127,6 +127,12 @@ keep zip hrrnum hrr_*
 
 collapse hrrnum hrr_*, by(zip)
 
+by hrrnum, sort: gen seq1=_n
+tab seq1
+xtile quint_hrr_overall = hrr_overall_rating if seq1==1, nq(5)
+bysort hrrnum (quint_hrr_overall): replace quint_hrr_overall=quint_hrr_overall[_n-1] if missing(quint_hrr_overall) 
+la var quint_hrr_overall "Quintile Overall NHC Rating 1=low, 5=high, HRR level"
+drop seq1
 *******************************************************
 save `data'\zip_hrr_nhc_ratings_2012.dta, replace
 
